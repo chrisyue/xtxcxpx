@@ -15,6 +15,7 @@ const argv = require('yargs')
     .alias('P', 'xPort')
     .alias('p', 'serverPort')
     .alias('s', 'serverSide')
+    .alias('c', 'xCount')
     .argv;
 
 const proxy = new Net.Server();
