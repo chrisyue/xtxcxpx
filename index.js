@@ -7,7 +7,6 @@ const argv = require('yargs')
         'H': 'localhost',
         'h': 'localhost',
         'c': 2,
-        's': true,
     })
     .demandOption(['P', 'p'])
     .boolean(['s'])
@@ -46,7 +45,7 @@ proxy.on('connection', (client) => {
         console.log(`Server error: ${err}`);
     });
 
-    server.connect({ host: argv.serverHost, port: serverPort }, () => {
+    server.connect({ host: argv.serverHost, port: argv.serverPort }, () => {
         console.log('Server connected');
     });
 
