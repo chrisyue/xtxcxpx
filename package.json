@@ -1,0 +1,26 @@
+{
+  "name": "xtxcxpx",
+  "version": "1.0.0",
+  "description": "不可描述的工具",
+  "main": "index.js",
+  "dependencies": {
+    "yargs": "^15.4.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chrisyue/xtxcxpx.git"
+  },
+  "keywords": [
+    "tcp"
+  ],
+  "author": "chrisyue",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/chrisyue/xtxcxpx/issues"
+  },
+  "homepage": "https://github.com/chrisyue/xtxcxpx#readme"
+}
