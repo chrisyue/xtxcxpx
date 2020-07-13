@@ -23,13 +23,13 @@ const argv = require('yargs')
 const proxy = new Net.Server();
 
 const obfuscate = (data) => {
-    const cipher = crypto.createCipher('aes-128-ecb', argv.key);
+    const cipher = crypto.createCipher('aes-128-cbc', argv.key);
 
     return cipher.update(data, 'utf8', 'hex') + cipher.final('hex');
 }
 
 const clear = (data) => {
-    const cipher = crypto.createDecipher('aes-128-ecb', argv.key);
+    const cipher = crypto.createDecipher('aes-128-cbc', argv.key);
 
     return cipher.update(data, 'hex', 'utf8') + cipher.final('utf8');
 }
