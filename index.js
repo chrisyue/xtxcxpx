@@ -72,7 +72,7 @@ proxy.on('connection', (client) => {
         }
 
         let handle = argv.serverSide ? clear : obfuscate;
-        server.write(chunk);
+        server.write(handle(chunk));
 
         ++count2;
     });
