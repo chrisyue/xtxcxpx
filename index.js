@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 const Net = require('net');
 const zlib = require('zlib');
+const crypto = require('crypto');
 
 const argv = require('yargs')
     .default({
@@ -15,10 +16,23 @@ const argv = require('yargs')
     .alias('P', 'xPort')
     .alias('p', 'serverPort')
     .alias('s', 'serverSide')
+    .alias('k', 'key')
     .alias('c', 'xCount')
     .argv;
 
 const proxy = new Net.Server();
+
+const obfuscate = (data) => {
+    const cipher = crypto.createCipher('aes-128-ecb', argv.key);
+
+    return cipher.update(data, 'utf8', 'hex') + cipher.final('hex');
+}
+
+const clear = (data) => {
+    const cipher = crypto.createDecipher('aes-128-ecb', argv.key);
+
+    return cipher.update(data, 'hex', 'utf8') + cipher.final('utf8');
+}
 
 proxy.listen(argv.xPort, argv.xHost, () => {
     console.log(`X Proxy listening ...`);
@@ -35,10 +49,9 @@ proxy.on('connection', (client) => {
             return;
         }
 
-        let handle = argv.serverSide ? zlib.deflate : zlib.inflate;
-        handle(chunk, (err, origin) => {
-            client.write(origin);
-        });
+        let handle = argv.serverSide ? obfuscate : clear;
+        client.write(handle(chunk));
+
         ++count;
     });
 
@@ -58,10 +71,9 @@ proxy.on('connection', (client) => {
             return;
         }
 
-        let handle = argv.serverSide ? zlib.inflate : zlib.deflate;
-        handle(chunk, (err, zipped) => {
-            server.write(zipped);
-        });
+        let handle = argv.serverSide ? clear : obfuscate;
+        server.write(chunk);
+
         ++count2;
     });
 
