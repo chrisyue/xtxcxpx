@@ -5,7 +5,7 @@ module.exports = (to, shouldObfuscate, key) => {
     let i = 0;
     if (shouldObfuscate) {
         return message => {
-            if (i > 5) {
+            if (i > 3) {
                 to.write(message);
 
                 return;
@@ -18,10 +18,9 @@ module.exports = (to, shouldObfuscate, key) => {
         };
     }
 
-    let j = 0;
     return message => {
         chunk.split(message).forEach(element => {
-            if (j > 5) {
+            if (i > 3) {
                 to.write(message);
 
                 return;
@@ -29,7 +28,7 @@ module.exports = (to, shouldObfuscate, key) => {
 
             const cleared = obfuscator.recover(element, key);
             to.write(cleared);
-            ++j;
+            ++i;
         });
     };
 };
