@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 const Net = require('net');
-const zlib = require('zlib');
 const crypto = require('crypto');
 
 const argv = require('yargs')
