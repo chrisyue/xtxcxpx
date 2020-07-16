@@ -7,9 +7,8 @@ const argv = require('yargs')
     .default({
         'H': 'localhost',
         'h': 'localhost',
-        'c': 2,
     })
-    .demandOption(['P', 'p'])
+    .demandOption(['P', 'p', 'k'])
     .boolean(['s'])
     .alias('H', 'xHost')
     .alias('h', 'serverHost')
@@ -17,22 +16,43 @@ const argv = require('yargs')
     .alias('p', 'serverPort')
     .alias('s', 'serverSide')
     .alias('k', 'key')
-    .alias('c', 'xCount')
     .argv;
 
 const proxy = new Net.Server();
 
-const obfuscate = (data) => {
-    const cipher = crypto.createCipher('aes-256-ctr', argv.key);
+const method = 'aes-128-cbc';
+const ivLength = 16;
+const iv = crypto.randomBytes(ivLength);
 
-    return Buffer.concat([cipher.update(data), cipher.final()]);
-}
+const obfuscate = (data) => {
+    const cipher = crypto.createCipheriv(method, Buffer.from(argv.key), iv);
+    const obfuscated =  Buffer.concat([cipher.update(data), cipher.final()]);
+
+    const length = Buffer.allocUnsafe(2);
+    length.writeUInt16BE(obfuscated.byteLength);
+
+    return Buffer.concat([length, iv, obfuscated]);
+};
 
 const clear = (data) => {
-    const cipher = crypto.createDecipher('aes-256-ctr', argv.key);
+    const length = data.readUInt16BE();
 
-    return Buffer.concat([cipher.update(data), cipher.final()]);
-}
+    const obfuscatedStart = 2 + ivLength;
+    const obfuscatedEnd = obfuscatedStart + length;
+
+    const iv = data.subarray(2, obfuscatedStart);
+    const obfuscated = data.subarray(obfuscatedStart, obfuscatedEnd);
+
+    const decipher = crypto.createDecipheriv(method, Buffer.from(argv.key), iv);
+    const cleared = Buffer.concat([decipher.update(obfuscated), decipher.final()]);
+
+    const left = data.subarray(obfuscatedEnd);
+    if (left.byteLength > 0) {
+        return Buffer.concat([cleared, clear(left)]);
+    }
+
+    return cleared;
+};
 
 proxy.listen(argv.xPort, argv.xHost, () => {
     console.log(`X Proxy listening ...`);
@@ -41,18 +61,14 @@ proxy.listen(argv.xPort, argv.xHost, () => {
 proxy.on('connection', (client) => {
     const server = new Net.Socket();
 
-    let count = 0;
     server.on('data', function (chunk) {
-        if (count > argv.xCount) {
-            client.write(chunk);
+        if (argv.serverSide) {
+            client.write(obfuscate(chunk));
 
             return;
         }
 
-        let handle = argv.serverSide ? obfuscate : clear;
-        client.write(handle(chunk));
-
-        ++count;
+        client.write(clear(chunk));
     });
 
     server.on('error', (err) => {
@@ -63,18 +79,14 @@ proxy.on('connection', (client) => {
         console.log('Server connected');
     });
 
-    let count2 = 0;
     client.on('data', (chunk) => {
-        if (count2 > argv.xCount) {
-            server.write(chunk);
+        if (argv.serverSide) {
+            server.write(clear(chunk));
 
             return;
         }
 
-        let handle = argv.serverSide ? clear : obfuscate;
-        server.write(handle(chunk));
-
-        ++count2;
+        server.write(obfuscate(chunk));
     });
 
     client.on('end', () => {
