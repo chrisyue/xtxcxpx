@@ -6,14 +6,22 @@ X a TCP service.
 
 # Usage
 
-For example, on the server side:
+For example, on the server-side:
 
 ```
-node index.js --xHost=chrisyue.com --xPort=3333 --serverHost=localhost --serverPort=22 --xCount=3 --serverSide
+node index.js --xHost=chrisyue.com \
+    --xPort=3333 --serverHost=localhost \
+    --serverPort=22 \
+    --key=xxx...(16 characters) \
+    --serverSide
 ```
 
-on the client side, keep the `serverHost`/`serverPort`/`xCount` the same as server's `xHost`/`xPort`/`xCount`
+on the client-side, keep the `serverHost`/`serverPort`/`key` the same as server's `xHost`/`xPort`/`key`
 
 ```
-node index.js --xHost=localhost --xPort=4444 --serverHost=chrisyue.com --serverPort= 3333 --xCount=3`
+node index.js --xHost=localhost \
+    --xPort=4444 \
+    --serverHost=chrisyue.com \
+    --serverPort=3333 \
+    --key=xxx...
 ```
