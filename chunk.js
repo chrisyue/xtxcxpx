@@ -18,7 +18,6 @@ const split = data => {
 
     const left = data.subarray(4 + length);
     if (left.byteLength > 0) {
-        console.log('has left');
         result = result.concat(split(left));
     }
 
