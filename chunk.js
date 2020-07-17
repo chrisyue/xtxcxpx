@@ -10,17 +10,29 @@ const join = data => {
     return result;
 };
 
+let fragment = Buffer.alloc(0);
 const split = data => {
+    data = Buffer.concat([fragment, data]);
     if (5 > data.byteLength) {
-        throw { message: 'invalid data' };
+        fragment = data;
+
+        return [];
+    }
+
+    const length = data.readUInt32BE();
+    const end = 4 + length;
+    if (end > data.byteLength) {
+        fragment = data;
+
+        return [];
     }
 
     let result = [];
+    result.push(data.subarray(4, end));
 
-    const length = data.readUInt32BE();
-    result.push(data.subarray(4, 4 + length));
+    fragment = Buffer.alloc(0);
 
-    const left = data.subarray(4 + length);
+    const left = data.subarray(end);
     if (left.byteLength > 0) {
         result = result.concat(split(left));
     }
