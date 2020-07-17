@@ -11,6 +11,10 @@ const join = data => {
 };
 
 const split = data => {
+    if (!data) {
+        return [];
+    }
+
     let result = [];
 
     const length = data.readUInt32BE();
