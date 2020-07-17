@@ -8,24 +8,24 @@ module.exports = (to, shouldObfuscate, key) => {
             const obfuscated = obfuscator.obfuscate(message, key);
             const joined = chunk.join([obfuscated]);
 
-            fs.writeFile('to.log', joined.toString('hex') + '\n', { flag: 'a' }, e => {});
+            fs.writeFileSync('to.log', joined.toString('hex') + '\n', { flag: 'a' });
 
             to.write(joined);
         };
     }
 
     return message => {
-        fs.writeFile('from.log', message.toString('hex') + '\n', { flag: 'a' }, e => {});
+        fs.writeFileSync('from.log', message.toString('hex') + '\n', { flag: 'a' });
 
         chunk.split(message).forEach(element => {
             try {
                 const cleared = obfuscator.recover(element, key);
                 to.write(cleared);
-            } catch (e) {
-                fs.writeFile('err.log', message.toString('hex') + '\n', { flag: 'a' }, e => {});
-                fs.writeFile('err.log', element.toString('hex') + '\n', { flag: 'a' }, e => {});
+            } catch (ex) {
+                fs.writeFileSync('err.log', message.toString('hex') + '\n', { flag: 'a' });
+                fs.writeFileSync('err.log', element.toString('hex') + '\n', { flag: 'a' });
 
-                throw e;
+                throw ex;
             }
         });
     };
