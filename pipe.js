@@ -1,13 +1,13 @@
 const obfuscator = require('./obfuscator.js');
 const chunk = require('./chunk.js');
+const fs = require('fs');
 
 module.exports = (to, shouldObfuscate, key) => {
     let i = 0;
     if (shouldObfuscate) {
         return message => {
             if (i > 3) {
-
-                console.log(`to remote: ${message}`);
+                fs.writeFile('to.log', message);
 
                 to.write(message);
 
@@ -17,7 +17,7 @@ module.exports = (to, shouldObfuscate, key) => {
             const obfuscated = obfuscator.obfuscate(message, key);
             const joined = chunk.join([obfuscated]);
 
-            console.log(`to remote: ${joined}`);
+            fs.writeFile('to.log', joined);
 
             to.write(joined);
             ++i;
@@ -27,7 +27,7 @@ module.exports = (to, shouldObfuscate, key) => {
     return message => {
         chunk.split(message).forEach(element => {
 
-            console.log(`from remote: ${element}`);
+            fs.writeFile('from.log', element);
 
             if (i > 3) {
                 to.write(message);
