@@ -10,13 +10,17 @@ const obfuscate = (data, key) => {
     return  Buffer.concat([iv, cipher.update(data), cipher.final()]);
 };
 
-const recover = (data, key) => {
+const recover = (data, key, callback) => {
     const iv = data.subarray(0, ivLength);
     const decipher = crypto.createDecipheriv(method, Buffer.from(key), iv);
 
     const obfuscated = data.subarray(ivLength);
 
-    return Buffer.concat([decipher.update(obfuscated), decipher.final()]);
+    try {
+        return Buffer.concat([decipher.update(obfuscated), decipher.final()]);
+    } catch (e) {
+        callback(e);
+    }
 };
 
 module.exports = { obfuscate, recover };
