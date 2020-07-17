@@ -11,8 +11,8 @@ const join = data => {
 };
 
 const split = data => {
-    if (!data) {
-        return [];
+    if (5 > data.byteLength) {
+        throw { message: 'invalid data' };
     }
 
     let result = [];
