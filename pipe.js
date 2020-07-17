@@ -8,7 +8,7 @@ module.exports = (to, shouldObfuscate, key) => {
             const obfuscated = obfuscator.obfuscate(message, key);
             const joined = chunk.join([obfuscated]);
 
-            fs.writeFile('to.log', joined.toString('hex'));
+            fs.writeFile('to.log', joined.toString('hex'), { flag: 'a' }, e => {});
 
             to.write(joined);
         };
@@ -17,7 +17,7 @@ module.exports = (to, shouldObfuscate, key) => {
     return message => {
         chunk.split(message).forEach(element => {
             const cleared = obfuscator.recover(element, key, e => {
-                fs.writeFile('from.log', joined.toString('hex'));
+                fs.writeFile('from.log', joined.toString('hex'), { flag: 'a' }, e => {});
 
                 throw e;
             });
