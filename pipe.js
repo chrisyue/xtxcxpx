@@ -7,7 +7,7 @@ module.exports = (to, shouldObfuscate, key) => {
         return message => {
             if (i > 3) {
 
-                console.log(`to remote: ${element}`);
+                console.log(`to remote: ${message}`);
 
                 to.write(message);
 
@@ -17,7 +17,7 @@ module.exports = (to, shouldObfuscate, key) => {
             const obfuscated = obfuscator.obfuscate(message, key);
             const joined = chunk.join([obfuscated]);
 
-            console.log(`to remote: ${element}`);
+            console.log(`to remote: ${joined}`);
 
             to.write(joined);
             ++i;
