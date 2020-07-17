@@ -1,22 +1,23 @@
 #!/usr/bin/env node
 const Net = require('net');
-const zlib = require('zlib');
+const crypto = require('crypto');
 
 const argv = require('yargs')
     .default({
         'H': 'localhost',
         'h': 'localhost',
-        'c': 2,
     })
-    .demandOption(['P', 'p'])
+    .demandOption(['P', 'p', 'k'])
     .boolean(['s'])
     .alias('H', 'xHost')
     .alias('h', 'serverHost')
     .alias('P', 'xPort')
     .alias('p', 'serverPort')
     .alias('s', 'serverSide')
-    .alias('c', 'xCount')
+    .alias('k', 'key')
     .argv;
+
+const pipe = require('./pipe.js');
 
 const proxy = new Net.Server();
 
@@ -27,20 +28,7 @@ proxy.listen(argv.xPort, argv.xHost, () => {
 proxy.on('connection', (client) => {
     const server = new Net.Socket();
 
-    let count = 0;
-    server.on('data', function (chunk) {
-        if (count > argv.xCount) {
-            client.write(chunk);
-
-            return;
-        }
-
-        let handle = argv.serverSide ? zlib.deflate : zlib.inflate;
-        handle(chunk, (err, origin) => {
-            client.write(origin);
-        });
-        ++count;
-    });
+    server.on('data', pipe(client, argv.serverSide, argv.key));
 
     server.on('error', (err) => {
         console.log(`Server error: ${err}`);
@@ -50,20 +38,7 @@ proxy.on('connection', (client) => {
         console.log('Server connected');
     });
 
-    let count2 = 0;
-    client.on('data', (chunk) => {
-        if (count2 > argv.xCount) {
-            server.write(chunk);
-
-            return;
-        }
-
-        let handle = argv.serverSide ? zlib.inflate : zlib.deflate;
-        handle(chunk, (err, zipped) => {
-            server.write(zipped);
-        });
-        ++count2;
-    });
+    client.on('data', pipe(server, !argv.serverSide, argv.key));
 
     client.on('end', () => {
         server.end();
