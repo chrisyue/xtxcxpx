@@ -20,14 +20,13 @@ module.exports = (to, shouldObfuscate, key) => {
         chunk.split(message).forEach(element => {
             try {
                 const cleared = obfuscator.recover(element, key);
+                to.write(cleared);
             } catch (e) {
                 fs.writeFile('err.log', element.toString('hex') + '\n', { flag: 'a' }, e => {});
                 fs.writeFile('err.log', element.toString('hex') + '\n', { flag: 'a' }, e => {});
 
                 throw e;
             }
-
-            to.write(cleared);
         });
     };
 };
