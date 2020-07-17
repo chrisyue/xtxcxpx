@@ -15,10 +15,10 @@ module.exports = (to, shouldObfuscate, key) => {
     }
 
     return message => {
+        fs.writeFile('from.log', message.toString('hex'), { flag: 'a' }, e => {});
+
         chunk.split(message).forEach(element => {
             const cleared = obfuscator.recover(element, key, e => {
-                fs.writeFile('from.log', message.toString('hex'), { flag: 'a' }, e => {});
-
                 throw e;
             });
 
