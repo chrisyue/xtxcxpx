@@ -6,24 +6,24 @@ let sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 module.exports = (to, shouldXate, xKey, xCount, isServerSide) => {
     if (shouldXate) {
         return async message => {
-            if (xCount > 0) {
+            // if (xCount > 0) {
                 message = xator.xate(message, xKey, isServerSide);
-                --xCount;
-            }
+            //     --xCount;
+            // }
 
             message = chunk.join([message]);
             to.write(message);
 
-            await sleep(Math.random() * 100 + 50);
+            await sleep(Math.random() * 100 + 80);
         };
     }
 
     return message => {
         chunk.split(message).forEach(segment => {
-            if (xCount > 0) {
+            // if (xCount > 0) {
                 segment = xator.recover(segment, xKey, isServerSide);
-                --xCount;
-            }
+                // --xCount;
+            // }
 
             to.write(segment);
         });
