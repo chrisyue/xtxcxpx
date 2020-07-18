@@ -3,14 +3,10 @@ const chunk = require('./chunk.js');
 
 let sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-module.exports = (to, shouldXate, xKey, xCount, isServerSide) => {
+module.exports = (to, shouldXate, xKey, isServerSide) => {
     if (shouldXate) {
         return async message => {
-            // if (xCount > 0) {
-                message = xator.xate(message, xKey, isServerSide);
-            //     --xCount;
-            // }
-
+            message = xator.xate(message, xKey, isServerSide);
             message = chunk.join([message]);
             to.write(message);
 
@@ -20,11 +16,7 @@ module.exports = (to, shouldXate, xKey, xCount, isServerSide) => {
 
     return message => {
         chunk.split(message).forEach(segment => {
-            // if (xCount > 0) {
-                segment = xator.recover(segment, xKey, isServerSide);
-                // --xCount;
-            // }
-
+            segment = xator.recover(segment, xKey, isServerSide);
             to.write(segment);
         });
     };

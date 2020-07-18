@@ -1,10 +1,11 @@
 const crypto = require('crypto');
+const zlib = require('zlib');
 
 const method = 'aes-128-cbc';
 const ivLength = 16;
 
-const requestHeader = 'GET /chat HTTP/1.1\r\nHost: my.chat.room\r\nUpgrade: websocket\r\n\r\n';
-const responseHeader = 'HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\n\r\n';
+const requestHeader = 'GET /chat HTTP/1.1\r\nHost: my.chat.room\r\nUpgrade: websocket\r\nAccept-Encoding: gzip, deflate\r\n\r\n';
+const responseHeader = 'HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nContent-Encoding: gzip\r\n\r\n';
 
 let is1stXate = true;
 const xate = (data, key, isServerSide) => {
@@ -16,9 +17,10 @@ const xate = (data, key, isServerSide) => {
         header = Buffer.from(isServerSide ? responseHeader : requestHeader);
         is1stXate = false;
     }
-    const xated = Buffer.from(Buffer.concat([iv, cipher.update(data), cipher.final()]).toString('base64'));
+    const xated = Buffer.concat([iv, cipher.update(data), cipher.final()]);
+    const zipped = zlib.brotliCompressSync(xated);
 
-    return Buffer.concat([header, xated]);
+    return Buffer.concat([header, zipped]);
 };
 
 let is1stRecover = true;
@@ -29,7 +31,7 @@ const recover = (data, key, isServerSide) => {
         is1stRecover = false;
     }
 
-    data = Buffer.from(data.toString(), 'base64');
+    data = zlib.brotliDecompressSync(data);
     const iv = data.subarray(0, ivLength);
     const decipher = crypto.createDecipheriv(method, Buffer.from(key), iv);
 
