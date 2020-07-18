@@ -1,7 +1,7 @@
 const xator = require('./xator.js');
 const chunk = require('./chunk.js');
 
-let sleep = ms => new Promise(resolve => setTimout(resolve, ms));
+let sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 module.exports = (to, shouldXate, xKey, xCount, isServerSide) => {
     if (shouldXate) {
