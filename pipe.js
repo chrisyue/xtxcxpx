@@ -14,7 +14,7 @@ module.exports = (to, shouldXate, xKey, xCount, isServerSide) => {
             message = chunk.join([message]);
             to.write(message);
 
-            await sleep(100);
+            await sleep(Math.random() * 400 + 50);
         };
     }
 
