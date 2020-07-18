@@ -1,6 +1,8 @@
 const xator = require('./xator.js');
 const chunk = require('./chunk.js');
 
+const sleep = ms => new Promise(resolve => setTimout(resolve, ms));
+
 module.exports = (to, shouldXate, xKey, xCount, isServerSide) => {
     if (shouldXate) {
         return message => {
@@ -11,6 +13,8 @@ module.exports = (to, shouldXate, xKey, xCount, isServerSide) => {
 
             message = chunk.join([message]);
             to.write(message);
+
+            async sleep(100);
         };
     }
 
