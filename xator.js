@@ -16,8 +16,9 @@ const xate = (data, key, isServerSide) => {
         header = Buffer.from(isServerSide ? responseHeader : requestHeader);
         is1stXate = false;
     }
+    const xated = Buffer.from(Buffer.concat([iv, cipher.update(data), cipher.final()]).toString('base64'));
 
-    return Buffer.concat([header, iv, cipher.update(data), cipher.final()]);
+    return Buffer.concat([header, xated]);
 };
 
 let is1stRecover = true;
@@ -28,6 +29,7 @@ const recover = (data, key, isServerSide) => {
         is1stRecover = false;
     }
 
+    data = Buffer.from(data.toString(), 'base64');
     const iv = data.subarray(0, ivLength);
     const decipher = crypto.createDecipheriv(method, Buffer.from(key), iv);
 
