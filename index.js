@@ -30,23 +30,27 @@ proxy.on('connection', (client) => {
 
     server.on('data', pipe(client, argv.serverSide, argv.key));
 
-    server.on('error', (err) => {
+    server.on('error', err => {
         console.log(`Server error: ${err}`);
     });
 
+    server.on('end', () => {
+        console.log('Server disconnected.');
+        client.end();
+    });
+
     server.connect({ host: argv.serverHost, port: argv.serverPort }, () => {
-        console.log('Server connected');
+        console.log('Server connected.');
     });
 
     client.on('data', pipe(server, !argv.serverSide, argv.key));
 
     client.on('end', () => {
+        console.log('Client disconnected.');
         server.end();
-        delete server;
     });
 
-    client.on('error', (err) => {
-        server.end();
-        delete server;
+    client.on('error', err => {
+        console.log(`Client error: ${err}.`);
     });
 });
