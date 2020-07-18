@@ -1,20 +1,27 @@
-const obfuscator = require('./obfuscator.js');
+const xator = require('./xator.js');
 const chunk = require('./chunk.js');
 
-module.exports = (to, shouldObfuscate, key) => {
-    if (shouldObfuscate) {
+module.exports = (to, shouldXate, xKey, xCount, isServerSide) => {
+    if (shouldXate) {
         return message => {
-            const obfuscated = obfuscator.obfuscate(message, key);
-            const joined = chunk.join([obfuscated]);
+            if (xCount > 0) {
+                message = xator.xate(message, xKey, isServerSide);
+                --xCount;
+            }
 
-            to.write(joined);
+            message = chunk.join([message]);
+            to.write(message);
         };
     }
 
     return message => {
-        chunk.split(message).forEach(element => {
-            const cleared = obfuscator.recover(element, key);
-            to.write(cleared);
+        chunk.split(message).forEach(segment => {
+            if (xCount > 0) {
+                segment = xator.recover(segment, xKey, isServerSide);
+                --xCount;
+            }
+
+            to.write(segment);
         });
     };
 };

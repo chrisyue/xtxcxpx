@@ -14,9 +14,10 @@ node index.js --xHost=chrisyue.com \
     --serverPort=22 \
     --key=xxx...(16 characters) \
     --serverSide
+    --xCount = 3
 ```
 
-on the client-side, keep the `serverHost`/`serverPort`/`key` the same as server's `xHost`/`xPort`/`key`
+on the client-side, keep the `serverHost`/`serverPort`/`key`/`xCount` the same as server's `xHost`/`xPort`/`key`/`xCount`
 
 ```
 node index.js --xHost=localhost \
@@ -24,4 +25,5 @@ node index.js --xHost=localhost \
     --serverHost=chrisyue.com \
     --serverPort=3333 \
     --key=xxx...
+    --xCount = 3
 ```
