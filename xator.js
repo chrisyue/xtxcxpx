@@ -7,8 +7,7 @@ const ivLength = 16;
 const requestHeader = 'GET /chat HTTP/1.1\r\nHost: my.chat.room\r\nUpgrade: websocket\r\nAccept-Encoding: gzip, deflate\r\n\r\n';
 const responseHeader = 'HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nContent-Encoding: gzip\r\n\r\n';
 
-let is1stXate = true;
-const xate = (data, key, isServerSide) => {
+const xate = (data, key, isServerSide, is1stXate) => {
     const iv = crypto.randomBytes(ivLength);
     const cipher = crypto.createCipheriv(method, Buffer.from(key), iv);
 
@@ -23,8 +22,7 @@ const xate = (data, key, isServerSide) => {
     return Buffer.concat([header, zipped]);
 };
 
-let is1stRecover = true;
-const recover = (data, key, isServerSide) => {
+const recover = (data, key, isServerSide, is1stRecover ) => {
     if (is1stRecover) {
         const header = isServerSide ? requestHeader : responseHeader;
         data = data.subarray(header.length);

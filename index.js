@@ -28,6 +28,8 @@ proxy.listen(argv.xPort, argv.xHost, () => {
 });
 
 proxy.on('connection', client => {
+    console.log('Client connected.');
+
     const server = new Net.Socket();
 
     server.on('data', pipe(client, argv.serverSide, argv.xKey, argv.serverSide, argv.bufferDuration));
