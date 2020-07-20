@@ -6,7 +6,7 @@ const argv = require('yargs')
     .default({
         'H': 'localhost',
         'h': 'localhost',
-        'b': 300,
+        'b': 128,
     })
     .demandOption(['P', 'p', 'K'])
     .boolean(['s'])
