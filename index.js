@@ -34,6 +34,7 @@ proxy.on('connection', client => {
 
     server.on('error', err => {
         console.log(`Server error: ${err}`);
+        client.end();
     });
 
     server.on('end', () => {
