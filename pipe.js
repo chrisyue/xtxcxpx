@@ -3,7 +3,7 @@ const chunk = require('./chunk.js');
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-module.exports = (to, shouldXate, xKey, isServerSide) => {
+module.exports = (to, shouldXate, xKey, isServerSide, bufferDuration) => {
     if (shouldXate) {
         let buffer = Buffer.alloc(0);
 
@@ -19,7 +19,7 @@ module.exports = (to, shouldXate, xKey, isServerSide) => {
             xated = chunk.join([xated]);
 
             to.write(xated);
-        }, 250);
+        }, bufferDuration);
 
         return message => {
             buffer = Buffer.concat([buffer, message]);
