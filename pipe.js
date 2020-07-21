@@ -1,32 +1,44 @@
-const obfuscator = require('./obfuscator.js');
+const xator = require('./xator.js');
 const chunk = require('./chunk.js');
-// const fs = require('fs');
 
-module.exports = (to, shouldObfuscate, key) => {
-    if (shouldObfuscate) {
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+module.exports = (to, shouldXate, xKey, isServerSide, bufferDuration) => {
+    if (shouldXate) {
+        let buffer = Buffer.alloc(0);
+        let is1stXate = true;
+
+        setInterval(() => {
+            if (buffer.byteLength < 1) {
+                return;
+            }
+
+            const buffer2 = buffer;
+            buffer = Buffer.alloc(0);
+
+            let xated = xator.xate(buffer2, xKey, isServerSide, is1stXate);
+            is1stXate = false;
+            xated = chunk.join([xated]);
+
+            to.write(xated);
+        }, bufferDuration);
+
         return message => {
-            const obfuscated = obfuscator.obfuscate(message, key);
-            const joined = chunk.join([obfuscated]);
-
-            // fs.writeFileSync('to.log', joined.toString('hex') + '\n', { flag: 'a' });
-
-            to.write(joined);
+            buffer = Buffer.concat([buffer, message]);
         };
     }
 
-    return message => {
-        // fs.writeFileSync('from.log', message.toString('hex') + '\n', { flag: 'a' });
+    let left = Buffer.alloc(0);
+    let is1stRecover = true;
 
-        chunk.split(message).forEach(element => {
-            // try {
-            const cleared = obfuscator.recover(element, key);
-            to.write(cleared);
-            // } catch (ex) {
-            //     fs.writeFileSync('err.log', message.toString('hex') + '\n', { flag: 'a' });
-            //     fs.writeFileSync('err.log', element.toString('hex') + '\n', { flag: 'a' });
-            //
-            //     throw ex;
-            // }
+    return message => {
+        message = Buffer.concat([left, message]);
+
+        chunk.split(message, remain => left = remain).forEach(segment => {
+            segment = xator.recover(segment, xKey, isServerSide, is1stRecover);
+            is1stRecover = false;
+
+            to.write(segment);
         });
     };
 };

@@ -6,15 +6,17 @@ const argv = require('yargs')
     .default({
         'H': 'localhost',
         'h': 'localhost',
+        'b': 128,
     })
-    .demandOption(['P', 'p', 'k'])
+    .demandOption(['P', 'p', 'K'])
     .boolean(['s'])
     .alias('H', 'xHost')
-    .alias('h', 'serverHost')
     .alias('P', 'xPort')
+    .alias('K', 'xKey')
+    .alias('h', 'serverHost')
     .alias('p', 'serverPort')
     .alias('s', 'serverSide')
-    .alias('k', 'key')
+    .alias('b', 'bufferDuration')
     .argv;
 
 const pipe = require('./pipe.js');
@@ -25,28 +27,35 @@ proxy.listen(argv.xPort, argv.xHost, () => {
     console.log(`X Proxy listening ...`);
 });
 
-proxy.on('connection', (client) => {
+proxy.on('connection', client => {
+    console.log('Client connected.');
+
     const server = new Net.Socket();
 
-    server.on('data', pipe(client, argv.serverSide, argv.key));
+    server.on('data', pipe(client, argv.serverSide, argv.xKey, argv.serverSide, argv.bufferDuration));
 
-    server.on('error', (err) => {
+    server.on('error', err => {
         console.log(`Server error: ${err}`);
+        client.end();
     });
 
-    server.connect({ host: argv.serverHost, port: argv.serverPort }, () => {
-        console.log('Server connected');
+    server.on('end', () => {
+        console.log('Server disconnected.');
+        client.end();
     });
 
-    client.on('data', pipe(server, !argv.serverSide, argv.key));
+    server.connect(argv.serverPort, argv.serverHost, () => {
+        console.log('Server connected.');
+    });
+
+    client.on('data', pipe(server, !argv.serverSide, argv.xKey, argv.serverSide, argv.bufferDuration));
 
     client.on('end', () => {
+        console.log('Client disconnected.');
         server.end();
-        delete server;
     });
 
-    client.on('error', (err) => {
-        server.end();
-        delete server;
+    client.on('error', err => {
+        console.log(`Client error: ${err}.`);
     });
 });

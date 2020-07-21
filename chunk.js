@@ -10,11 +10,9 @@ const join = data => {
     return result;
 };
 
-let fragment = Buffer.alloc(0);
-const split = data => {
-    data = Buffer.concat([fragment, data]);
+const split = (data, handleLeft) => {
     if (5 > data.byteLength) {
-        fragment = data;
+        handleLeft(data);
 
         return [];
     }
@@ -22,7 +20,7 @@ const split = data => {
     const length = data.readUInt32BE();
     const end = 4 + length;
     if (end > data.byteLength) {
-        fragment = data;
+        handleLeft(data);
 
         return [];
     }
@@ -30,11 +28,11 @@ const split = data => {
     let result = [];
     result.push(data.subarray(4, end));
 
-    fragment = Buffer.alloc(0);
+    handleLeft(Buffer.alloc(0));
 
     const left = data.subarray(end);
     if (left.byteLength > 0) {
-        result = result.concat(split(left));
+        result = result.concat(split(left, handleLeft));
     }
 
     return result;
