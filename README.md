@@ -2,7 +2,31 @@
 
 不可描述的用途
 
-X a TCP service.
+X a TCP service. X can mean obfuscate, hide, cover, disguise, etc.
+
+```
+ +--------+   +                +
+ |        |   |                |
+ | server |   |                |
+ |        |   |                |
+ +-^---+--+   |                |
+   |   |      |                |
+Hello world   |                |
+   |   |      |                |
++--+---v--+   |                |   +---------+
+|         +-------!@#$%^&*&*------>+         |
+| xtxcxpx |   |                |   | xtxcxpx |
+|         +<------+_)(*&^%$#-------+         |
++---------+   |                |   +--+---^--+
+              |                |      |   |
+              |                |   Hello world
+              |                |      |   |
+              |                |   +--v---+-+
+              |                |   |        |
+              |                |   | client |
+              |                |   |        |
+              +                +   +--------+
+```
 
 # Usage
 
@@ -14,7 +38,7 @@ node index.js --xHost=chrisyue.com \
     --serverPort=22 \
     --key=xxx...(16 characters) \
     --serverSide
-    --bufferDuration 400
+    --bufferDuration 200
 ```
 
 on the client-side, keep the `serverHost`/`serverPort`/`key` the same as server's `xHost`/`xPort`/`key`
@@ -25,5 +49,7 @@ node index.js --xHost=localhost \
     --serverHost=chrisyue.com \
     --serverPort=3333 \
     --key=xxx...
-    --bufferDuration 300
+    --bufferDuration 100
 ```
+
+Run `node index.js --help` for more.
